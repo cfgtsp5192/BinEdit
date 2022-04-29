@@ -75,9 +75,17 @@ end
 
 local function ReadLuaHeader(Header) -- Made this function for testing purposes
 	local Editor = ChunkEditor.new(Header, 1, 4, 4);
-	local LuaSymbol = Editor:GetString(4)
-	local LuaVersion = Editor:GetInteger(); -- Should be 81/82/83 (0x51/0x52/0x53), as this is revised for those version formats
-	local 
+	local LuaSymbol = Editor:GetString(4) -- Should be "\27Lua" always
+	local LuaVersion = Editor:GetBits8(); -- Should be 81/82/83 (0x51/0x52/0x53), as this is revised for those version formats
+	local LuaFormat = Editor:GetBits8();
+	local LuaEndianess = Editor:GetBits8();
+	local LuaIntSize = Editor:GetBits8();
+	local LuaSizeT = Editor:GetBits8();
+	local LuaInstSize = Editor:GetBits8();
+	local LuaNumSize = Editor:GetBits8();
+	local LuaIntegral = Editor:GetBits8();
+	
+	print(LuaSymbol, LuaVersion, LuaFormat, LuaEndianess, LuaIntSize, LuaSizeT, LuaInstSize, LuaNumSize, LuaIntegral);
 end
 
 -- Reader
