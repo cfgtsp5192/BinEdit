@@ -3,15 +3,13 @@
 	Written by @cfgtsp5192
 	
 	System notes:
-	
-	- If the status is 0, the editor is not active.
-	- Else if the status is 1, the editor is active.
-	
-	- If the status gets set back from 1 to 0, the buffer is not cleared.
 
-	- StringLen tells the reader how long of a string to read if a length argument is not passed.
-	- The string reader always uses the passed length unless its not used, thus uses the StringLen value.
-
+	- This only supports little endians atm, I have not implemented big endian yet
+	- If the status is 0, the editor is not active
+	- Else if the status is 1, the editor is active
+	- If the status gets set back from 1 to 0, the buffer is not cleared
+	- StringLen tells the reader how long of a string to read if a length argument is not passed
+	- The string reader always uses the passed length unless its not used, thus uses the StringLen value
 	- An unlimited amount of editors can be created by the ChunkEditor.new() function
 ]]
 
@@ -73,8 +71,9 @@ end
 
 -- Special
 
-local function ReadLuaHeader(Header) -- Made this function for testing purposes
-	local Editor = ChunkEditor.new(Header, 1, 4, 4);
+local function ReadLuaHeader(Editor, Header) -- Made this function for testing purposes
+	Editor = Editor or ChunkEditor.new(Header, 1, 4, 4);
+	
 	local LuaSymbol = Editor:GetString(4) -- Should be "\27Lua" always
 	local LuaVersion = Editor:GetBits8(); -- Should be 81/82/83 (0x51/0x52/0x53), as this is revised for those version formats
 	local LuaFormat = Editor:GetBits8();
@@ -85,7 +84,20 @@ local function ReadLuaHeader(Header) -- Made this function for testing purposes
 	local LuaNumSize = Editor:GetBits8();
 	local LuaIntegral = Editor:GetBits8();
 	
-	print(LuaSymbol, LuaVersion, LuaFormat, LuaEndianess, LuaIntSize, LuaSizeT, LuaInstSize, LuaNumSize, LuaIntegral);
+	return LuaSymbol, LuaVersion, LuaFormat, LuaEndianess, LuaIntSize, LuaSizeT, LuaInstSize, LuaNumSize, LuaIntegral;
+end
+
+local function ReadLuaFunction(Editor, Chunk)
+	Editor = Editor or ChunkEditor.new(Header, 1, 4, 4);
+	
+	ReadLuaHeader(Editor); -- Skip the header
+	
+	local Consts = {};
+	local Upvals = {};
+	local Protos = {};
+	local Locals = {};
+	
+	
 end
 
 -- Reader
@@ -132,6 +144,20 @@ function ChunkEditor:ReadBits64()
 	end
 end
 
+function ChunkEditor:ReadFloat32()
+	if self.Status == 1 then
+		local Sign, Mantissa, Exponent;
+		
+		
+	end
+end
+
+function ChunkEditor:ReadDouble64()
+	if self.Status == 1 then
+		
+	end
+end
+
 function ChunkEditor:ReadInteger()
 	if self.Status == 1 then
 		if self.IntegerSize % 4 == 0 then
@@ -157,5 +183,7 @@ function ChunkEditor:ReadString(len)
 end
 
 -- Writer 
+
+
 
 return ChunkEditor;
