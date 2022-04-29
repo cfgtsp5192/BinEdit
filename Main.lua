@@ -169,28 +169,14 @@ function ChunkEditor:ReadBits64()
 	end
 end
 
-function ChunkEditor:ReadFloat32()
+function ChunkEditor:ReadIEEE754()
 	if self.Status == 1 then
-		local Value = self:GrabBits32();
+		local Val = self:GrabBits64();
+		local Value, Sign, Mantissa, Exponent;
 		
-		local Sign, Mantissa, Exponent;
-		
-		if self.Endianess == 1 then
-			
-		else
-			
-		end
-	end
-end
-
-function ChunkEditor:ReadDouble64()
-	if self.Status == 1 then
-		local Value = self:GrabBits64();
-		local Sign, Mantissa, Exponent;
-		
-		Mantissa = Extract(Value, 0, 52);
-		Exponent = Extract(Value, 52, 63);
-		Sign = Extract(Value, 63, 64);
+		Mantissa = Extract(Val, 0, 52);
+		Exponent = Extract(Val, 52, 63);
+		Sign = Extract(Val, 63, 64);
 		
 		if Exponent == (0 / 0) then
 			Mantissa = 0;
@@ -200,7 +186,13 @@ function ChunkEditor:ReadDouble64()
 			Exponent = 2047;
 		end
 		
+		Value = (Mantissa / (2 ^ 52)) * ((Exponent - 1023) * (2 ^ (Exponent - 1023)))
 		
+		if Sign == 1 then
+			Value = -Value;
+		end
+		
+		return Value;
 	end
 end
 
