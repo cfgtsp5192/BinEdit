@@ -58,6 +58,10 @@ function ChunkEditor.new(Buff, Status, StringLen, IntegerSize)
 	return self;
 end
 
+function self:ExportChunk()
+	return self.Buff, self.Len;	
+end
+
 -- Functions intended to make code look more organized (Set/Increment/Decrement)
 
 function self:Set(Val, Value)
