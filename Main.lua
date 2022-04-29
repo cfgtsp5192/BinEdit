@@ -2,6 +2,10 @@
 	Binary chunk editor made in lua (DOES NOT SUPPORT FILES YET!!)
 	Written by @cfgtsp5192
 	
+	THIS IS A LARGE WORK IN PROGRESS!!
+
+	I have not tested the ChunkEditor:GrabIEEE754() yet, expect bugs.
+	
 	System notes:
 
 	- This only supports little endians atm, I have not implemented big endian yet
@@ -42,11 +46,12 @@ function ChunkEditor.new(Buff, Status, StringLen, IntegerSize)
 	local self = setmetatable({}, ChunkEditor);
 	
 	self.Buff = Buff or false;
+	self.Len = (Buff and #Buff) or 0;
 	self.Status = Status or DefaultStatus;
 	self.StringLen = StringLen or DefaultLen;
 	self.IntegerSize = IntegerSize or DefaultSize;
 	
-	if self.Buff == false then
+	if self.Buff == false or self.Len == 0 then
 		error(ErrMessage1);
 	end
 	
@@ -125,13 +130,13 @@ end]]
 
 -- Reader
 
-function ChunkEditor:ReadBits8()
+function ChunkEditor:GrabBits8()
 	if self.Status == 1 then
 		return self:Increment(Byte(self.Buff, self.Pos, self.Pos), 1);
 	end
 end
 
-function ChunkEditor:ReadBits16()
+function ChunkEditor:GrabBits16()
 	if self.Status == 1 then
 		local A, B = Byte(self.Buff, self.Pos, self.Pos + 2);
 		A = A + (B * 256);
@@ -140,7 +145,7 @@ function ChunkEditor:ReadBits16()
 	end
 end
 
-function ChunkEditor:ReadBits32()
+function ChunkEditor:GrabBits32()
 	if self.Status == 1 then
 		local A, B, C, D = Byte(self.Buff, self.Pos, self.Pos + 4);
 		A = A + (B * 256);
@@ -151,7 +156,7 @@ function ChunkEditor:ReadBits32()
 	end
 end
 
-function ChunkEditor:ReadBits64()
+function ChunkEditor:GrabBits64()
 	if self.Status == 1 then
 		local A, B, C, D, E, F, G, H = Byte(self.Buff, self.Pos, self.Pos + 8);
 		A = A + E;
@@ -169,7 +174,7 @@ function ChunkEditor:ReadBits64()
 	end
 end
 
-function ChunkEditor:ReadIEEE754()
+function ChunkEditor:GrabIEEE754()
 	if self.Status == 1 then
 		local Val = self:GrabBits64();
 		local Value, Sign, Mantissa, Exponent;
@@ -178,10 +183,10 @@ function ChunkEditor:ReadIEEE754()
 		Exponent = Extract(Val, 52, 63);
 		Sign = Extract(Val, 63, 64);
 		
-		if Exponent == (0 / 0) then
+		if Exponent == (0 / 0) then -- NaN
 			Mantissa = 0;
 			Exponent = 0;
-		elseif Exponent == (1 / 0) then
+		elseif Exponent == (1 / 0) then -- inf
 			Mantissa = 0;
 			Exponent = 2047;
 		end
@@ -202,7 +207,7 @@ function ChunkEditor:ReadInteger()
 			local A = 0;
 			
 			for i = 1, Floor(self.IntegerSize / 4) do
-				A = A + self:ReadBits32();
+				A = A + self:GrabBits32();
 			end
 		
 			return A;
@@ -210,7 +215,7 @@ function ChunkEditor:ReadInteger()
 	end
 end
 
-function ChunkEditor:ReadString(len)
+function ChunkEditor:GrabString(len)
 	if self.Status == 1 then
 		if not len then
 			return self:Increment(Sub(self.Buff, self.Pos, self.Pos + self.StringLen), self.StringLen);
@@ -222,6 +227,23 @@ end
 
 -- Writer 
 
+function ChunkEditor:WriteString(Str)
+	if self.Status == 1 then
+		local Len = #Str;
+		
+		if Len > 0 then
+			for i = 1, Len do
+				self.Buff = self.Buff + Sub(Str, i, i);
+				self.Len = self.Len + 1;
+			end
+		end
+	end
+end
 
+function ChunkEditor:WriteInteger(Int)
+	if self.Status == 1 then
+		
+	end
+end
 
 return ChunkEditor;
