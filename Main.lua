@@ -28,6 +28,16 @@ local DefaultStatus = 0;
 local DefaultLen = 4;
 local DefaultSize = 8;
 
+-- Util
+
+local function Extract(X, Field, Width)
+	X = (X % (2 ^ Width)) / (2 ^ Field);
+	X = X - (X % 1);
+	return X;
+end
+
+-- Main
+
 function ChunkEditor.new(Buff, Status, StringLen, IntegerSize)
 	local self = setmetatable({}, ChunkEditor);
 	
@@ -69,7 +79,7 @@ function self:Decrement(Val, Decrement)
 	return Val or false;
 end
 
--- Special
+--[[
 
 local function ReadLuaHeader(Editor, Header) -- Made this function for testing purposes
 	Editor = Editor or ChunkEditor.new(Header, 1, 4, 4);
@@ -111,7 +121,7 @@ local ReadLuaFunction; function ReadLuaFunction(Editor, Chunk)
 	ChunkName = Editor:GrabString();
 	FirstLine = Editor:GrabBits8();
 	LastLine = Editor:GrabBits8();
-end
+end]]
 
 -- Reader
 
@@ -159,15 +169,34 @@ end
 
 function ChunkEditor:ReadFloat32()
 	if self.Status == 1 then
+		local Value = self:GrabBits32();
+		
 		local Sign, Mantissa, Exponent;
 		
-		
+		if self.Endianess == 1 then
+			
+		else
+			
+		end
 	end
 end
 
 function ChunkEditor:ReadDouble64()
 	if self.Status == 1 then
+		local LowValue = self:GrabBits32();
+		local HighValue = self:GrabBits32();
 		
+		local Sign, Mantissa, Exponent;
+		
+		if self.Endianess == 1 then
+			Mantissa = Extract(HighValue, 0, 52);
+			Exponent = Extract(HighValue, 52, 63);
+			Sign = Extract(HighValue, 63, 64);
+		else
+			Mantissa = Extract(HighValue, 12, 64);
+			Exponent = Extract(HighValue, 1, 12);
+			Sign = Extract(HighValue, 0, 1);
+		end
 	end
 end
 
