@@ -39,10 +39,10 @@ function ChunkEditor.new(Buff, Status, StringLen)
 	return self;
 end
 
-function self:Increment(Str, Increment)
+function self:Increment(Val, Increment) -- Function intended to make code look nicer
 	self.Pos = self.Pos + Increment;
 	
-	return Str or false;
+	return Val or false;
 end
 
 function ChunkEditor:ReadString(len)
@@ -50,6 +50,32 @@ function ChunkEditor:ReadString(len)
 		if not len then
 			return self:Increment(Sub(self.Buff, self.Pos, self.Pos + self.StringLen), self.StringLen);
 		end
+	end
+end
+
+function ChunkEditor:ReadBits8()
+	if self.Status == 1 then
+		return self:Increment(Byte(self.Buff, self.Pos, self.Pos), 1);
+	end
+end
+
+function ChunkEditor:ReadBits16()
+	if self.Status == 1 then
+		local A, B = Byte(self.Buff, self.Pos, self.Pos + 2);
+		A = A + (B * 256);
+		
+		return self:Increment(A, 2);
+	end
+end
+
+function ChunkEditor:ReadBits32()
+	if self.Status == 1 then
+		local A, B, C, D = Byte(self.Buff, self.Pos, self.Pos + 4);
+		A = A + (B * 256);
+		A = A + (C * 65536);
+		A = A + (D * 16777216);
+		
+		return self:Increment(A, 4);
 	end
 end
 
