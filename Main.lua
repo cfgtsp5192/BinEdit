@@ -71,9 +71,16 @@ function self:Decrement(Val, Decrement)
 	return Val or false;
 end
 
---------------------------------------------
------------------- READER ------------------
---------------------------------------------
+-- Special
+
+local function ReadLuaHeader(Header) -- Made this function for testing purposes
+	local Editor = ChunkEditor.new(Header, 1, 4, 4);
+	local LuaSymbol = Editor:GetString(4)
+	local LuaVersion = Editor:GetInteger(); -- Should be 81/82/83 (0x51/0x52/0x53), as this is revised for those version formats
+	local 
+end
+
+-- Reader
 
 function ChunkEditor:ReadBits8()
 	if self.Status == 1 then
@@ -136,11 +143,11 @@ function ChunkEditor:ReadString(len)
 		if not len then
 			return self:Increment(Sub(self.Buff, self.Pos, self.Pos + self.StringLen), self.StringLen);
 		end
+		
+		return self:Increment(Sub(self.Buff, self.Pos, self.Pos + len), len);
 	end
 end
 
---------------------------------------------
------------------- WRITER ------------------
---------------------------------------------
+-- Writer 
 
 return ChunkEditor;
