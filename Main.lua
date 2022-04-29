@@ -71,6 +71,10 @@ function self:Decrement(Val, Decrement)
 	return Val or false;
 end
 
+--------------------------------------------
+------------------ READER ------------------
+--------------------------------------------
+
 function ChunkEditor:ReadBits8()
 	if self.Status == 1 then
 		return self:Increment(Byte(self.Buff, self.Pos, self.Pos), 1);
@@ -134,5 +138,9 @@ function ChunkEditor:ReadString(len)
 		end
 	end
 end
+
+--------------------------------------------
+------------------ WRITER ------------------
+--------------------------------------------
 
 return ChunkEditor;
