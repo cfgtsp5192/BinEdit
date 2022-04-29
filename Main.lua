@@ -45,8 +45,28 @@ function ChunkEditor.new(Buff, Status, StringLen, IntegerSize)
 	return self;
 end
 
-function self:Increment(Val, Increment) -- Function intended to make code look nicer
-	self.Pos = self.Pos + Increment;
+-- Functions intended to make code look more organized (Set/Increment/Decrement)
+
+function self:Set(Val, Value)
+	if type(Value) == "number" then
+		self.Pos = Value;
+	end
+	
+	return Val or false;
+end
+
+function self:Increment(Val, Increment)
+	if type(Increment) == "number" then
+		self.Pos = self.Pos + Increment;
+	end
+	
+	return Val or false;
+end
+
+function self:Decrement(Val, Decrement)
+	if type(Decrement) == "number" then
+		self.Pos = self.Pos - Decrement;
+	end
 	
 	return Val or false;
 end
