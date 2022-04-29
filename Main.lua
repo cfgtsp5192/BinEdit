@@ -20,6 +20,7 @@ ChunkEditor.__index = ChunkEditor;
 
 local Sub = string.sub;
 local Modf = math.modf;
+local Floor = math.floor;
 
 -- Init settings, edit if you wish to change defaults
 
@@ -97,7 +98,7 @@ function ChunkEditor:ReadInteger()
 		if self.IntegerSize % 4 == 0 then
 			local A = 0;
 			
-			for i = 1, self.IntegerSize do
+			for i = 1, Floor(self.IntegerSize / 4) do
 				A = A + self:ReadBits32();
 			end
 		
