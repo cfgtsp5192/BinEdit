@@ -18,19 +18,24 @@
 local ChunkEditor = {};
 ChunkEditor.__index = ChunkEditor;
 
+local Sub = string.sub;
+local Modf = math.modf;
+
 -- Init settings, edit if you wish to change defaults
 
 local ErrMessage1 = "Unknown chunk!"; -- When a nil chunk is passed, throw an error with this message
 
 local DefaultStatus = 0;
 local DefaultLen = 4;
+local DefaultSize = 8;
 
-function ChunkEditor.new(Buff, Status, StringLen)
+function ChunkEditor.new(Buff, Status, StringLen, IntegerSize)
 	local self = setmetatable({}, ChunkEditor);
 	
 	self.Buff = Buff or false;
 	self.Status = Status or DefaultStatus;
 	self.StringLen = StringLen or DefaultLen;
+	self.IntegerSize = IntegerSize or DefaultSize;
 	
 	if self.Buff == false then
 		error(ErrMessage1);
@@ -43,14 +48,6 @@ function self:Increment(Val, Increment) -- Function intended to make code look n
 	self.Pos = self.Pos + Increment;
 	
 	return Val or false;
-end
-
-function ChunkEditor:ReadString(len)
-	if self.Status == 1 then
-		if not len then
-			return self:Increment(Sub(self.Buff, self.Pos, self.Pos + self.StringLen), self.StringLen);
-		end
-	end
 end
 
 function ChunkEditor:ReadBits8()
@@ -92,6 +89,28 @@ function ChunkEditor:ReadBits64()
 		A = A + (H * 16777216);
 		
 		return self:Increment(A, 8);
+	end
+end
+
+function ChunkEditor:ReadInteger()
+	if self.Status == 1 then
+		if self.IntegerSize % 4 == 0 then
+			local A = 0;
+			
+			for i = 1, self.IntegerSize do
+				A = A + self:ReadBits32();
+			end
+		
+			return A;
+		end
+	end
+end
+
+function ChunkEditor:ReadString(len)
+	if self.Status == 1 then
+		if not len then
+			return self:Increment(Sub(self.Buff, self.Pos, self.Pos + self.StringLen), self.StringLen);
+		end
 	end
 end
 
