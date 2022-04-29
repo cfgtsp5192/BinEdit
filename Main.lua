@@ -79,4 +79,20 @@ function ChunkEditor:ReadBits32()
 	end
 end
 
+function ChunkEditor:ReadBits64()
+	if self.Status == 1 then
+		local A, B, C, D, E, F, G, H = Byte(self.Buff, self.Pos, self.Pos + 8);
+		A = A + E;
+		
+		A = A + (B * 256);
+		A = A + (C * 65536);
+		A = A + (D * 16777216);
+		A = A + (F * 256);
+		A = A + (G * 65536);
+		A = A + (H * 16777216);
+		
+		return self:Increment(A, 8);
+	end
+end
+
 return ChunkEditor;
