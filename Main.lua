@@ -163,6 +163,8 @@ function ChunkEditor:ReadBits64()
 		A = A + (G * 65536);
 		A = A + (H * 16777216);
 		
+		-- A = A * (2 ^ 32)
+		
 		return self:Increment(A, 8);
 	end
 end
@@ -183,20 +185,22 @@ end
 
 function ChunkEditor:ReadDouble64()
 	if self.Status == 1 then
-		local LowValue = self:GrabBits32();
-		local HighValue = self:GrabBits32();
-		
+		local Value = self:GrabBits64();
 		local Sign, Mantissa, Exponent;
 		
-		if self.Endianess == 1 then
-			Mantissa = Extract(HighValue, 0, 52);
-			Exponent = Extract(HighValue, 52, 63);
-			Sign = Extract(HighValue, 63, 64);
-		else
-			Mantissa = Extract(HighValue, 12, 64);
-			Exponent = Extract(HighValue, 1, 12);
-			Sign = Extract(HighValue, 0, 1);
+		Mantissa = Extract(Value, 0, 52);
+		Exponent = Extract(Value, 52, 63);
+		Sign = Extract(Value, 63, 64);
+		
+		if Exponent == (0 / 0) then
+			Mantissa = 0;
+			Exponent = 0;
+		elseif Exponent == (1 / 0) then
+			Mantissa = 0;
+			Exponent = 2047;
 		end
+		
+		
 	end
 end
 
