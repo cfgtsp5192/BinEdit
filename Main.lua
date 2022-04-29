@@ -87,7 +87,7 @@ local function ReadLuaHeader(Editor, Header) -- Made this function for testing p
 	return LuaSymbol, LuaVersion, LuaFormat, LuaEndianess, LuaIntSize, LuaSizeT, LuaInstSize, LuaNumSize, LuaIntegral;
 end
 
-local function ReadLuaFunction(Editor, Chunk)
+local ReadLuaFunction; function ReadLuaFunction(Editor, Chunk)
 	Editor = Editor or ChunkEditor.new(Header, 1, 4, 4);
 	
 	ReadLuaHeader(Editor); -- Skip the header
@@ -97,7 +97,20 @@ local function ReadLuaFunction(Editor, Chunk)
 	local Protos = {};
 	local Locals = {};
 	
+	local ConstAmt = 0;
+	local UpvalAmt = 0;
+	local ProtoAmt = 0;
+	local LocalAmt = 0;
 	
+	local IsVararg = false;
+	
+	local ChunkName = "";
+	local FirstLine = 0;
+	local LastLine = 0;
+	
+	ChunkName = Editor:GrabString();
+	FirstLine = Editor:GrabBits8();
+	LastLine = Editor:GrabBits8();
 end
 
 -- Reader
